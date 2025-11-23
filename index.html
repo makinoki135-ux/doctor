@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アヤカクリニック もんしんアプリ</title>
+    <!-- Tailwind CSSの読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* カスタムスタイル */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f9ff; /* Light Blue Background */
+        }
+        .container {
+            max-width: 90%;
+            margin-top: 2rem;
+        }
+        /* ステップのナビゲーションスタイル */
+        .step-indicator {
+            @apply flex justify-between items-center mb-6;
+        }
+        .step-item {
+            @apply flex-1 text-center py-2 relative;
+        }
+        .step-circle {
+            @apply w-8 h-8 mx-auto mb-1 rounded-full flex items-center justify-center font-bold text-white transition-all duration-300;
+        }
+        .step-line {
+            @apply absolute top-5 left-1/2 right-1/2 h-0.5 bg-gray-300 -z-10;
+        }
+        .active .step-circle {
+            @apply bg-blue-500 shadow-lg;
+        }
+        .completed .step-circle {
+            @apply bg-green-500;
+        }
+        .active .step-line, .completed .step-line {
+            background-color: #3b82f6; /* Blue-500 */
+        }
+        .input-group {
+            @apply mb-4;
+        }
+        /* チェックボックスとラベルを囲むカードのスタイル */
+        .symptom-checkbox-group {
+            @apply bg-white p-4 rounded-xl shadow-md transition hover:shadow-lg cursor-pointer border-2 border-gray-100 flex items-center;
+        }
+        /* チェックボックスがチェックされた時のカードのスタイル */
+        input[type="checkbox"]:checked + label > div {
+            @apply border-blue-500 bg-blue-50 border-4;
+        }
+        /* チェックボックスのカスタムサイズ */
+        .custom-checkbox {
+            @apply w-6 h-6 mr-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8 flex justify-center">
+
+    <div class="container bg-white p-6 sm:p-10 rounded-3xl shadow-2xl w-full lg:w-3/4 xl:w-2/3">
+
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-700 mb-6 text-center">
+            アヤカクリニック
+        </h1>
+        <p class="text-gray-500 text-center mb-8">タブレットもんしんスタート！かんじゃさんのじょうほうをにゅうりょくしてね。</p>
+
+        <!-- ステップインジケーター -->
+        <div class="step-indicator">
+            <div id="step-1" class="step-item active">
+                <div class="step-circle">1</div>
+                <span class="text-sm text-blue-500 font-medium">きほんじょうほう</span>
+                <div class="step-line left-0 w-0"></div>
+            </div>
+            <div id="step-2" class="step-item">
+                <div class="step-circle bg-gray-300">2</div>
+                <span class="text-sm text-gray-500 font-medium">しょうじょうにゅうりょく</span>
+                <div class="step-line w-full"></div>
+            </div>
+            <div id="step-3" class="step-item">
+                <div class="step-circle bg-gray-300">3</div>
+                <span class="text-sm text-gray-500 font-medium">しんだんけっか</span>
+                <div class="step-line right-0 w-0"></div>
+            </div>
+        </div>
+
+        <!-- 1. きほんじょうほうにゅうりょく -->
+        <div id="stage1" class="stage">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">1. かんじゃさんのきほんじょうほう</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="input-group">
+                    <label for="patientName" class="block text-sm font-medium text-gray-600">おなまえ</label>
+                    <input type="text" id="patientName" placeholder="やまだ はなこ" class="mt-1 block w-full rounded-lg border-gray-300 p-3 border focus:border-blue-500 focus:ring-blue-500 transition">
+                </div>
+                <div class="input-group">
+                    <label for="age" class="block text-sm font-medium text-gray-600">ねんれい (さい)</label>
+                    <input type="number" id="age" min="0" max="150" value="5" class="mt-1 block w-full rounded-lg border-gray-300 p-3 border focus:border-blue-500 focus:ring-blue-500 transition">
+                </div>
+                <div class="input-group">
+                    <label for="height" class="block text-sm font-medium text-gray-600">しんちょう (cm)</label>
+                    <input type="number" id="height" min="0" max="300" value="110" class="mt-1 block w-full rounded-lg border-gray-300 p-3 border focus:border-blue-500 focus:ring-blue-500 transition">
+                </div>
+                <div class="input-group">
+                    <label for="weight" class="block text-sm font-medium text-gray-600">たいじゅう (kg)</label>
+                    <input type="number" id="weight" min="0" max="500" value="20" class="mt-1 block w-full rounded-lg border-gray-300 p-3 border focus:border-blue-500 focus:ring-blue-500 transition">
+                </div>
+            </div>
+            <div class="input-group mt-4">
+                <label for="temperature" class="block text-sm font-medium text-gray-600">たいおん (℃)</label>
+                <input type="number" id="temperature" step="0.1" min="30" max="45" value="36.5" class="mt-1 block w-full rounded-lg border-gray-300 p-3 border focus:border-blue-500 focus:ring-blue-500 transition">
+            </div>
+            <div class="mt-8 flex justify-end">
+                <button onclick="nextStep()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-105">
+                    つぎへ (しょうじょうにゅうりょく) →
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. しょうじょうにゅうりょく (チェックボックス) -->
+        <div id="stage2" class="stage hidden">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">2. しょうじょうにゅうりょく</h2>
+            <p class="text-lg text-gray-600 mb-6">どこがいたいですか？きになるところをえらんでください。（いくつでもえらべます）</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- からだのしょうじょう -->
+                <div>
+                    <h3 class="text-xl font-medium text-blue-600 mb-4">からだのしょうじょう</h3>
+                    <div class="space-y-3">
+                        
+                        <!-- 症状カードの代わりにチェックボックスを使用 -->
+                        <div class="symptom-checkbox-group">
+                            <input type="checkbox" id="symptom1" name="symptom" value="からだぜんたいがいたい" class="custom-checkbox">
+                            <label for="symptom1" class="flex-grow">
+                                <div class="p-2 -m-2 rounded-xl"> <!-- ラベル全体をクリック可能にするためのdiv -->
+                                    <div class="text-lg font-bold">💪 からだぜんたいがいたい</div>
+                                    <p class="text-sm text-gray-500">（かぜかな？）</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="symptom-checkbox-group">
+                            <input type="checkbox" id="symptom2" name="symptom" value="おなかがいたい" class="custom-checkbox">
+                            <label for="symptom2" class="flex-grow">
+                                <div class="p-2 -m-2 rounded-xl">
+                                    <div class="text-lg font-bold">🤢 おなかがいたい</div>
+                                    <p class="text-sm text-gray-500">（たべすぎたかな？）</p>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="symptom-checkbox-group">
+                            <input type="checkbox" id="symptom3" name="symptom" value="のどがいたい" class="custom-checkbox">
+                            <label for="symptom3" class="flex-grow">
+                                <div class="p-2 -m-2 rounded-xl">
+                                    <div class="text-lg font-bold">🗣️ のどがいたい</div>
+                                    <p class="text-sm text-gray-500">（イガイガする）</p>
+                                </div>
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- かお・そのたのしょうじょう -->
+                <div>
+                    <h3 class="text-xl font-medium text-blue-600 mb-4">かお・そのたのしょうじょう</h3>
+                    <div class="space-y-3">
+
+                        <div class="symptom-checkbox-group">
+                            <input type="checkbox" id="symptom4" name="symptom" value="あたまがいたい" class="custom-checkbox">
+                            <label for="symptom4" class="flex-grow">
+                                <div class="p-2 -m-2 rounded-xl">
+                                    <div class="text-lg font-bold">🤕 あたまがいたい</div>
+                                    <p class="text-sm text-gray-500">（ガンガンする）</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="symptom-checkbox-group">
+                            <input type="checkbox" id="symptom5" name="symptom" value="はなみず・はなづまり" class="custom-checkbox">
+                            <label for="symptom5" class="flex-grow">
+                                <div class="p-2 -m-2 rounded-xl">
+                                    <div class="text-lg font-bold">🤧 はなみず・はなづまり</div>
+                                    <p class="text-sm text-gray-500">（ズルズルする）</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="symptom-checkbox-group">
+                            <input type="checkbox" id="symptom6" name="symptom" value="せきがでる" class="custom-checkbox">
+                            <label for="symptom6" class="flex-grow">
+                                <div class="p-2 -m-2 rounded-xl">
+                                    <div class="text-lg font-bold">😷 せきがでる</div>
+                                    <p class="text-sm text-gray-500">（コンコンする）</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevStep()" class="px-6 py-3 bg-gray-400 text-white font-semibold rounded-full shadow-lg hover:bg-gray-500 transition transform hover:scale-105">
+                    ← もどる (きほんじょうほう)
+                </button>
+                <button onclick="nextStep()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-105">
+                    つぎへ (しんだんけっか) →
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. しんだんけっか -->
+        <div id="stage3" class="stage hidden">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">3. しんだんけっか</h2>
+
+            <!-- 診断結果のメインエリア -->
+            <div class="bg-blue-50 p-6 rounded-xl shadow-inner mb-6">
+                <div class="flex items-center mb-4">
+                    <svg class="w-8 h-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.145a11.955 11.955 0 01-1.29 4.307m-5.467 5.467a11.955 11.955 0 01-4.307-1.29m4.307 1.29a11.955 11.955 0 01-4.307-1.29m-1.29-4.307a11.955 11.955 0 014.307-1.29m4.307 1.29a11.955 11.955 0 014.307 1.29m-1.29 4.307a11.955 11.955 0 01-4.307 1.29m-5.467-5.467a11.955 11.955 0 01-4.307 1.29M3 12h.01M20 12h.01M9 6h.01M9 18h.01M15 6h.01M15 18h.01"></path></svg>
+                    <h3 class="text-2xl font-bold text-blue-700">せんせいからのしんだん</h3>
+                </div>
+                <p id="diagnosisResult" class="text-xl text-gray-800 font-medium leading-relaxed"></p>
+                <p id="treatmentPlan" class="text-lg text-green-600 mt-4 font-semibold"></p>
+            </div>
+
+            <!-- かんじゃじょうほうサマリー -->
+            <h3 class="text-xl font-semibold mb-3 text-gray-700">かんじゃさんのデータ</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm bg-gray-100 p-4 rounded-lg">
+                <p><span class="font-medium text-gray-600">なまえ:</span> <span id="summaryName"></span></p>
+                <p><span class="font-medium text-gray-600">ねんれい:</span> <span id="summaryAge"></span> さい</p>
+                <p><span class="font-medium text-gray-600">たいおん:</span> <span id="summaryTemp" class="font-bold text-red-500"></span> ℃</p>
+                <p><span class="font-medium text-gray-600">しんちょう/たいじゅう:</span> <span id="summaryHeightWeight"></span></p>
+                <p><span class="font-medium text-gray-600">BMI:</span> <span id="summaryBMI"></span></p>
+                <p><span class="font-medium text-gray-600">おもなしょうじょう:</span> <span id="summarySymptoms"></span></p>
+            </div>
+
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevStep()" class="px-6 py-3 bg-gray-400 text-white font-semibold rounded-full shadow-lg hover:bg-gray-500 transition transform hover:scale-105">
+                    ← もどる (しょうじょうにゅうりょく)
+                </button>
+                <button onclick="location.reload()" class="px-6 py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg hover:bg-green-700 transition transform hover:scale-105">
+                    しんさつをおわりにする
+                </button>
+            </div>
+        </div>
+
+        <!-- カスタムアラートボックス -->
+        <div id="customAlert" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full text-center">
+                <p id="alertMessage" class="text-lg font-medium text-gray-700 mb-4"></p>
+                <button onclick="closeAlert()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 変数定義 ---
+        let currentStage = 1;
+        const totalStages = 3;
+
+        // --- UI操作ヘルパー関数 ---
+
+        /**
+         * カスタムアラートボックスを表示する
+         * @param {string} message 表示するメッセージ
+         */
+        function showAlert(message) {
+            document.getElementById('alertMessage').textContent = message;
+            document.getElementById('customAlert').classList.remove('hidden');
+        }
+
+        /**
+         * カスタムアラートボックスを閉じる
+         */
+        function closeAlert() {
+            document.getElementById('customAlert').classList.add('hidden');
+        }
+
+        /**
+         * ステップインジケーターを更新する
+         */
+        function updateStepIndicator() {
+            for (let i = 1; i <= totalStages; i++) {
+                const stepElement = document.getElementById(`step-${i}`);
+                stepElement.classList.remove('active', 'completed');
+
+                if (i < currentStage) {
+                    stepElement.classList.add('completed');
+                    stepElement.querySelector('.step-circle').classList.replace('bg-gray-300', 'bg-green-500');
+                    stepElement.querySelector('span').classList.replace('text-gray-500', 'text-green-500');
+                } else if (i === currentStage) {
+                    stepElement.classList.add('active');
+                    stepElement.querySelector('.step-circle').classList.replace('bg-gray-300', 'bg-blue-500');
+                    stepElement.querySelector('span').classList.replace('text-gray-500', 'text-blue-500');
+                } else {
+                    stepElement.querySelector('.step-circle').classList.replace('bg-green-500', 'bg-gray-300');
+                    stepElement.querySelector('.step-circle').classList.replace('bg-blue-500', 'bg-gray-300');
+                    stepElement.querySelector('span').classList.replace('text-blue-500', 'text-gray-500');
+                    stepElement.querySelector('span').classList.replace('text-green-500', 'text-gray-500');
+                }
+            }
+        }
+
+        /**
+         * 画面を切り替える
+         */
+        function showStage(stageNumber) {
+            document.querySelectorAll('.stage').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`stage${stageNumber}`).classList.remove('hidden');
+            currentStage = stageNumber;
+            updateStepIndicator();
+        }
+
+        // --- ステージ1 (きほんじょうほう) のバリデーション ---
+        function validateStage1() {
+            const name = document.getElementById('patientName').value.trim();
+            const age = document.getElementById('age').value;
+            const temp = document.getElementById('temperature').value;
+            
+            if (name === "" || age === "" || temp === "") {
+                showAlert("おなまえ、ねんれい、たいおんはかならずにゅうりょくしてください。");
+                return false;
+            }
+            if (parseFloat(age) <= 0 || parseFloat(age) > 150) {
+                 showAlert("ねんれいをただしくにゅうりょくしてください。");
+                 return false;
+            }
+            if (parseFloat(temp) < 35 || parseFloat(temp) > 42) {
+                 showAlert("たいおんをただしくにゅうりょくしてください。");
+                 return false;
+            }
+            return true;
+        }
+
+        /**
+         * ステージ2で選択された症状をチェックボックスから取得する
+         * @returns {string[]} 選択された症状の配列
+         */
+        function getSelectedSymptoms() {
+            // チェックされている全ての症状入力エレメントを取得
+            const checkedBoxes = document.querySelectorAll('input[name="symptom"]:checked');
+            // value属性（症状名）の配列を作成
+            const symptomsArray = Array.from(checkedBoxes).map(checkbox => checkbox.value);
+            return symptomsArray;
+        }
+
+        // --- ステージ3 (しんだんけっか) のロジック ---
+        function calculateDiagnosis() {
+            const name = document.getElementById('patientName').value.trim() || 'かんじゃさん';
+            const age = parseFloat(document.getElementById('age').value);
+            const height = parseFloat(document.getElementById('height').value); // cm
+            const weight = parseFloat(document.getElementById('weight').value); // kg
+            const temp = parseFloat(document.getElementById('temperature').value);
+
+            // チェックボックスから選択された症状を取得
+            const symptomsArray = getSelectedSymptoms();
+
+            let mainDiagnosis = "とくに おおきな もんだいは なさそうですね。";
+            let treatment = "きょうは ぐっすり ねむって、おいしい ごはんを たべてくださいね。";
+            let advice = "";
+
+            // --- しんだんロジック ---
+
+            // 1. たいおんチェック
+            if (temp >= 37.5) {
+                mainDiagnosis = `**はつねつ**が ありますね。たいおんは ${temp.toFixed(1)}℃です。`;
+                treatment = "ひえぴたを はって、たくさん すいぶんほきゅうを してください。";
+            }
+
+            // 2. しょうじょうチェック (症状はひらがな/カタカナで比較)
+            const hasSymptom = (s) => symptomsArray.includes(s);
+            
+            if (hasSymptom('のどがいたい') && hasSymptom('せきがでる')) {
+                mainDiagnosis = `**かぜ**の かのうせいが たかいですね。`;
+                treatment += "せきどめと のどの えんしょうを おさえる おくすりを だしておきます。";
+            } else if (hasSymptom('おなかがいたい')) {
+                mainDiagnosis = `**きゅうせいいちょうえん（おなかの かぜ）**かもしれません。`;
+                treatment += "おなかを やすませるため、しょうかに よいものを すこしずつ たべるようにしてください。";
+            } else if (hasSymptom('あたまがいたい') && temp < 37.5) {
+                mainDiagnosis = `**きんちょうせいずつう**かもしれません。`;
+                treatment += "タブレットをみる じかんを すこし へらして、くびや かたを あたためて やすんでください。";
+            } else if (symptomsArray.length > 0) {
+                 // その他、選択された症状に基づいた汎用的な診断
+                mainDiagnosis = `**かぜの ひきはじめ**かもしれません。せんたくされた しょうじょうは ${symptomsArray.join('と')}ですね。`;
+                treatment += "てあらい うがいを しっかりして、あたたかくして ねましょう。";
+            }
+            
+            // 症状が何も選択されていない場合の診断
+            if (symptomsArray.length === 0 && temp < 37.5) {
+                mainDiagnosis = `おねつもないし、しょうじょうも なさそうですね！**とてもげんきです！**`;
+                treatment = "びょうきに ならないように、これからも げんきに あそんでくださいね！";
+            }
+
+            // 3. BMIチェック (けんこうアドバイスとして)
+            let bmi = 0;
+            if (height > 0 && weight > 0) {
+                const heightM = height / 100;
+                bmi = weight / (heightM * heightM);
+            }
+            
+            if (age > 4) { 
+                 if (bmi < 15) {
+                    advice = "さいきん すこし やせぎみかもしれません。バランスよく、しっかり たべるようにしましょう！";
+                 } else if (bmi > 20) {
+                    advice = "すこし たいじゅうが ふえすぎかもしれません。そとで たくさん からだを うごかして あそぶようにしましょう！";
+                 }
+            }
+
+
+            // --- けっかのひょうじ ---
+            document.getElementById('diagnosisResult').innerHTML = mainDiagnosis + (advice ? `<br><br>【せんせいからの アドバイス】${advice}` : '');
+            document.getElementById('treatmentPlan').textContent = `【しょほうせん】: ${treatment}`;
+
+            // --- サマリーのひょうじ ---
+            document.getElementById('summaryName').textContent = name;
+            document.getElementById('summaryAge').textContent = age;
+            document.getElementById('summaryTemp').textContent = temp.toFixed(1);
+            document.getElementById('summaryHeightWeight').textContent = `${height}cm / ${weight}kg`;
+            document.getElementById('summaryBMI').textContent = bmi > 0 ? bmi.toFixed(1) : 'ふめい';
+            document.getElementById('summarySymptoms').textContent = symptomsArray.length > 0 ? symptomsArray.join('、') : 'とくになし';
+        }
+
+        // --- ナビゲーションかんすう ---
+
+        function nextStep() {
+            if (currentStage === 1) {
+                if (!validateStage1()) return;
+            }
+
+            if (currentStage === 2) {
+                // 症状入力後、診断ロジックを実行
+                calculateDiagnosis();
+            }
+
+            if (currentStage < totalStages) {
+                showStage(currentStage + 1);
+                // 画面トップへスクロール
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function prevStep() {
+            if (currentStage > 1) {
+                showStage(currentStage - 1);
+                 // 画面トップへスクロール
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // しょきか：ステージ1をひょうじ
+        document.addEventListener('DOMContentLoaded', () => {
+            showStage(1);
+        });
+
+    </script>
+</body>
+</html>
